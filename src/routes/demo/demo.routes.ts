@@ -11,6 +11,7 @@ export const list = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({
+        success: z.boolean(),
         code: z.number(),
         message: z.string(),
         data: z.array(z.object({
@@ -41,12 +42,10 @@ export const add = createRoute({
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.object({
+        success: z.boolean(),
         code: z.number(),
         message: z.string(),
-        data: z.array(z.object({
-          id: z.number(),
-          title: z.string(),
-        })),
+        data: z.null(),
       }),
       '接口描述',
     ),
