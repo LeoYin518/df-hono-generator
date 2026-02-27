@@ -6,6 +6,19 @@ import { pinoLog } from '../middleware/pino-logger.js'
 export function createRouter(): AppOpenAPI {
   return new OpenAPIHono<AppType>({
     strict: false,
+    defaultHook: (result, c) => {
+      if (!result.success) {
+        const { fieldErrors } = result.error.flatten()
+        return c.json({
+          success: false,
+          error: {
+            name: result.error.name,
+            // message: result.error.issues,
+            message: fieldErrors,
+          },
+        }, 400)
+      }
+    },
   })
 }
 

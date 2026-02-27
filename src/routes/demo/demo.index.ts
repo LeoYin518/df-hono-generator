@@ -4,5 +4,6 @@ import * as routes from './demo.routes.js'
 
 const router = createRouter()
   .openapi(routes.list, handlers.list)
+  .openapi(routes.add, handlers.add)
 
 export default router

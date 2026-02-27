@@ -23,4 +23,35 @@ export const list = createRoute({
   },
 })
 
+export const add = createRoute({
+  path: '/demoAdd',
+  method: 'post',
+  tags,
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            title: z.string({ message: 'title 必须是字符串' }),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({
+        code: z.number(),
+        message: z.string(),
+        data: z.array(z.object({
+          id: z.number(),
+          title: z.string(),
+        })),
+      }),
+      '接口描述',
+    ),
+  },
+})
+
 export type ListRoute = typeof list
+export type AddRoute = typeof add
