@@ -29,15 +29,12 @@ export const add = createRoute({
   method: 'post',
   tags,
   request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: z.object({
-            title: z.string({ message: 'title 必须是字符串' }),
-          }),
-        },
-      },
-    },
+    body: jsonContent(
+      z.object({
+        title: z.string({ message: 'title 必须是字符串' }),
+      }),
+      '添加参数',
+    ),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
