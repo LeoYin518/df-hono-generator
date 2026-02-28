@@ -8,6 +8,12 @@ dotenvExpand.expand(dotenv.config())
 const EnvSchema = z.object({
   NODE_ENV: z.string().default('development'),
   PORT: z.coerce.number().default(3000),
+  // OSS
+  OSS_ACCESS_KEY_ID: z.string(),
+  OSS_ACCESS_KEY_SECRET: z.string(),
+  OSS_BUCKET: z.string(),
+  OSS_REGION: z.string(),
+  OSS_BASE_URL: z.string(),
 })
 
 export type Env = z.infer<typeof EnvSchema>

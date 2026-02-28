@@ -30,17 +30,21 @@ export function ok<T>(
   }, HttpStatusCodes.OK as 200)
 }
 
-export function fail(
+export function fail<
+  S extends ContentfulStatusCode,
+>(
   c: Context<AppType>,
-  code: string | number,
+  status: S,
   message: string,
   error?: unknown,
-  status: ContentfulStatusCode = HttpStatusCodes.BAD_REQUEST as ContentfulStatusCode,
 ) {
-  return c.json<ErrorResponse>({
-    success: false,
-    code,
-    message,
-    error,
-  }, status)
+  return c.json(
+    {
+      success: false as const,
+      code: status,
+      message,
+      error,
+    },
+    status,
+  )
 }
