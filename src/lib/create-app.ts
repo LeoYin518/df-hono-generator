@@ -30,11 +30,11 @@ export default function createApp() {
   const app = createRouter()
   // notFound & onError
   app.notFound((c) => {
-    return fail(c, 'NOT_FOUND', 'Not Found', undefined, 404)
+    return fail(c, HttpStatusCodes.NOT_FOUND, 'Not Found')
   })
   app.onError((err, c) => {
-    console.error('Unhandled Error:', err)
-    return fail(c, 'INTERNAL_SERVER_ERROR', 'Internal Server Error', undefined, 500)
+    c.var.logger.error(`Unhandled Error: ${err}`)
+    return fail(c, HttpStatusCodes.INTERNAL_SERVER_ERROR, 'Internal Server Error')
   })
   // favicon.ico
   app.use('/favicon.ico', serveStatic({ root: './src/public' }))

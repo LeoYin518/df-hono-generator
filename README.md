@@ -3,6 +3,7 @@
 基于 `Hono + TypeScript + Zod OpenAPI` 的后端服务模板。
 
 这份文档定位为长期复用的项目手册，包含：
+
 - 快速启动
 - 环境变量规范
 - 目录与命名约定
@@ -13,6 +14,7 @@
 ## 1. 快速开始
 
 ### 1.1 环境要求
+
 - Node.js `>= 20`
 - pnpm `>= 8`
 
@@ -39,6 +41,7 @@ pnpm run dev
 默认地址：`http://localhost:3000`
 
 ### 1.5 API 文档
+
 - OpenAPI JSON: `GET /doc`
 - Scalar UI: `GET /scalar`
 
@@ -46,15 +49,15 @@ pnpm run dev
 
 环境变量由 [`src/env.ts`](src/env.ts) 使用 Zod 在启动时校验，不满足要求会直接退出进程。
 
-| 变量名 | 必填 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `NODE_ENV` | 否 | `development` | 运行环境 |
-| `PORT` | 否 | `3000` | 服务端口 |
-| `OSS_ACCESS_KEY_ID` | 是 | - | 阿里云 OSS AccessKey ID |
-| `OSS_ACCESS_KEY_SECRET` | 是 | - | 阿里云 OSS AccessKey Secret |
-| `OSS_BUCKET` | 是 | - | OSS Bucket 名称 |
-| `OSS_REGION` | 是 | - | OSS Region，例如 `oss-cn-hangzhou` |
-| `OSS_BASE_URL` | 是 | - | OSS 对外访问基础地址 |
+| 变量名                  | 必填 | 默认值        | 说明                               |
+| ----------------------- | ---- | ------------- | ---------------------------------- |
+| `NODE_ENV`              | 否   | `development` | 运行环境                           |
+| `PORT`                  | 否   | `3000`        | 服务端口                           |
+| `OSS_ACCESS_KEY_ID`     | 是   | -             | 阿里云 OSS AccessKey ID            |
+| `OSS_ACCESS_KEY_SECRET` | 是   | -             | 阿里云 OSS AccessKey Secret        |
+| `OSS_BUCKET`            | 是   | -             | OSS Bucket 名称                    |
+| `OSS_REGION`            | 是   | -             | OSS Region，例如 `oss-cn-hangzhou` |
+| `OSS_BASE_URL`          | 是   | -             | OSS 对外访问基础地址               |
 
 示例：
 
@@ -100,6 +103,7 @@ src/
 ```
 
 新增业务模块时，建议沿用三件套：
+
 - `xxx.routes.ts`
 - `xxx.handler.ts`
 - `xxx.index.ts`
@@ -113,20 +117,24 @@ app.route('/prefix', xxxRouter)
 ## 5. 路由规范
 
 ### 5.1 设计原则
+
 - 使用 `@hono/zod-openapi` 的 `createRoute` 声明路由。
 - 每个接口必须声明：`path`、`method`、`tags`、`responses`。
 - 有请求体时必须提供 Zod schema（便于自动校验与文档生成）。
 
 ### 5.2 文件职责
+
 - `*.routes.ts`：只做协议层定义（请求/响应 schema）。
 - `*.handler.ts`：只做业务逻辑与调用外部服务。
 - `*.index.ts`：路由与 handler 绑定。
 
 ### 5.3 命名建议
+
 - 路由对象名使用业务语义，例如 `list`, `create`, `detail`, `update`, `remove`。
 - handler 与 route 对象同名，减少映射负担。
 
 ### 5.4 URL 约定
+
 - 模块级前缀在 `app.ts` 中统一挂载。
 - 具体接口 path 在 `*.routes.ts` 中定义。
 - 建议采用资源化命名，避免动词堆叠。
@@ -147,6 +155,7 @@ app.route('/prefix', xxxRouter)
 ```
 
 约定：
+
 - `success = true`
 - `code = 0`（业务成功码）
 - HTTP 状态码通常为 `200`
@@ -165,6 +174,7 @@ app.route('/prefix', xxxRouter)
 ```
 
 约定：
+
 - `success = false`
 - `code` 与 HTTP 状态码/错误标识一致
 - `message` 为可读错误信息
@@ -173,11 +183,13 @@ app.route('/prefix', xxxRouter)
 ### 6.3 当前全局错误处理
 
 在 [`src/lib/create-app.ts`](src/lib/create-app.ts) 中已内置：
+
 - 参数校验失败：`400 BAD_REQUEST`
 - 路由不存在：`404 NOT_FOUND`
 - 未捕获异常：`500 INTERNAL_SERVER_ERROR`
 
 建议新增业务错误时使用：
+
 - `400` 参数错误
 - `401` 未认证
 - `403` 无权限
@@ -191,6 +203,7 @@ app.route('/prefix', xxxRouter)
 项目当前使用 `node:test` + `tsx`。
 
 ### 7.1 存放约定
+
 - 测试文件放在根目录 `test/`
 - 文件命名：`*.test.ts`
 
@@ -201,6 +214,7 @@ pnpm run test
 ```
 
 ### 7.3 测试目标建议
+
 - 每个路由至少覆盖：
   - 1 个成功用例
   - 1 个参数校验失败用例
@@ -227,6 +241,7 @@ cp .env.example .env
 ```
 
 建议至少设置：
+
 - `NODE_ENV=production`
 - `PORT=<生产端口>`
 - OSS 相关全部变量
@@ -256,6 +271,7 @@ pm2 startup
 ### 8.6 反向代理（可选）
 
 建议在 Nginx/Caddy 前置：
+
 - 统一 TLS
 - 统一域名与路由
 - 限流与日志聚合

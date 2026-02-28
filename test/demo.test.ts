@@ -3,7 +3,6 @@ import { before, describe, it } from 'node:test'
 
 let app: { request: (input: RequestInfo | URL, init?: RequestInit) => Response | Promise<Response> }
 
-
 before(async () => {
   process.env.OSS_ACCESS_KEY_ID = process.env.OSS_ACCESS_KEY_ID || 'test-key-id'
   process.env.OSS_ACCESS_KEY_SECRET = process.env.OSS_ACCESS_KEY_SECRET || 'test-key-secret'
@@ -15,8 +14,8 @@ before(async () => {
   app = mod.default
 })
 
-describe('Demo routes', () => {
-  it('GET /test/demo should return demo list', async () => {
+describe('demo routes', () => {
+  it('gET /test/demo should return demo list', async () => {
     const res = await app.request('/test/demo')
     assert.equal(res.status, 200)
 
@@ -33,7 +32,7 @@ describe('Demo routes', () => {
     assert.equal(body.data.length, 3)
   })
 
-  it('POST /test/demoAdd should accept valid payload', async () => {
+  it('pOST /test/demoAdd should accept valid payload', async () => {
     const res = await app.request('/test/demoAdd', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -54,7 +53,7 @@ describe('Demo routes', () => {
     assert.equal(body.data, null)
   })
 
-  it('POST /test/demoAdd should reject invalid payload', async () => {
+  it('pOST /test/demoAdd should reject invalid payload', async () => {
     const res = await app.request('/test/demoAdd', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
