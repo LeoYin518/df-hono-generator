@@ -25,13 +25,14 @@ export const list = createRoute({
 })
 
 export const add = createRoute({
-  path: '/demoAdd',
+  path: '/add',
   method: 'post',
   tags,
   request: {
     body: jsonContent(
       z.object({
-        title: z.string({ message: 'title 必须是字符串' }),
+        username: z.string({ message: 'username 必须是字符串' }),
+        gender: z.int({ message: 'gender 必须是数字 0=男 或 1=女' }).min(0).max(1),
       }),
       '添加参数',
     ),

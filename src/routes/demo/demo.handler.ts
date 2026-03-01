@@ -1,5 +1,7 @@
 import type { AddRoute, ListRoute } from './demo.routes.js'
 import type { AppRouteHandler } from '@/lib/types.js'
+import db from '@/db/index.js'
+import { test } from '@/db/schema.js'
 import { ok } from '@/lib/response.js'
 
 export const list: AppRouteHandler<ListRoute> = (c) => {
@@ -11,7 +13,10 @@ export const list: AppRouteHandler<ListRoute> = (c) => {
 }
 
 export const add: AppRouteHandler<AddRoute> = async (c) => {
-  const { title } = await c.req.json()
-  c.var.logger.info(title)
+  const { username, gender } = await c.req.json()
+  await db.insert(test).values({
+    username,
+    gender,
+  })
   return ok(c, null)
 }

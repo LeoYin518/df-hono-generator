@@ -14,6 +14,8 @@ const EnvSchema = z.object({
   OSS_BUCKET: z.string(),
   OSS_REGION: z.string(),
   OSS_BASE_URL: z.string(),
+  // DB
+  DB_FILE_URL: z.string().default('./src/db/dev.db'),
 })
 
 export type Env = z.infer<typeof EnvSchema>
