@@ -2,7 +2,7 @@ import { createRoute, z } from '@hono/zod-openapi'
 import * as HttpStatusCodes from '@/lib/http-status-codes.js'
 import jsonContent from '@/lib/json-content.js'
 
-const tags = ['管理员-登录接口']
+const tags = ['登录接口']
 
 export const login = createRoute({
   path: '/login',
@@ -12,24 +12,30 @@ export const login = createRoute({
     body: jsonContent(z.object({
       account: z.string().min(3),
       password: z.string().min(3),
-    }), '管理员-登录参数'),
+    }), '登录参数'),
   },
   responses: {
     [HttpStatusCodes.OK]: jsonContent(z.object({
       token: z.string().min(1),
       expiresIn: z.int().min(1),
-    }), '管理员-登录'),
+    }), '登录'),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(z.object({
-      account: z.string(),
-      password: z.string(),
+      success: z.boolean(),
+      code: z.string().or(z.number()),
+      message: z.string(),
+      error: z.any().optional(),
     }), '用户不存在'),
     [HttpStatusCodes.FORBIDDEN]: jsonContent(z.object({
-      account: z.string(),
-      password: z.string(),
+      success: z.boolean(),
+      code: z.string().or(z.number()),
+      message: z.string(),
+      error: z.any().optional(),
     }), '登录失败，非管理员账号'),
     [HttpStatusCodes.BAD_REQUEST]: jsonContent(z.object({
-      account: z.string(),
-      password: z.string(),
+      success: z.boolean(),
+      code: z.string().or(z.number()),
+      message: z.string(),
+      error: z.any().optional(),
     }), '密码错误'),
   },
 })

@@ -1,7 +1,6 @@
 import { configureOpenAPI } from '@/lib/configure-open-api.js'
 import createApp from '@/lib/create-app.js'
-import adminAuth from '@/routes/admin-web/auth/auth.index.js'
-import demo from '@/routes/demo/demo.index.js'
+import adminAuth from '@/routes/auth/auth.index.js'
 import alioss from '@/routes/oss/alioss.index.js'
 import { requireAdminAuth, requireEitherAuth } from './middleware/auth.js'
 
@@ -15,7 +14,6 @@ app.use('/oss/*', requireEitherAuth())
 
 // 定义路由数组
 const routes = [
-  { path: '/test', router: demo },
   { path: '/oss', router: alioss },
   { path: '/admin/auth', router: adminAuth },
 ]

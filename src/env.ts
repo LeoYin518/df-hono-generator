@@ -17,7 +17,7 @@ const EnvSchema = z.object({
   // DB
   DB_FILE_URL: z.string().default('./src/db/dev.db'),
   // REDIS
-  REDIS_SERVER: z.string().default('redis://user:123456@localhost:6379'),
+  REDIS_SERVER: z.string().default('redis://default:123456@localhost:6379'),
   // JWT
   JWT_ADMIN_SECRET: z.string(),
   JWT_ADMIN_EXPIRES_IN_SECONDS: z.coerce.number().int().min(60).default(86400),

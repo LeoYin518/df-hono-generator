@@ -22,9 +22,6 @@ export const login: AppRouteHandler<LoginRoute> = async (c) => {
   }
 
   const found = rows[0]
-  if (found.role !== AuthRole.ADMIN) {
-    return fail(c, HttpStatusCodes.FORBIDDEN, '登录失败，非管理员账号')
-  }
 
   if (found.status !== AuthStatus.ENABLED) {
     if (found.status === AuthStatus.DISABLED) {

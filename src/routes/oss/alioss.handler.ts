@@ -8,7 +8,7 @@ export const uploadHandler: AppRouteHandler<UploadHandlerRoute> = async (c) => {
   const form = await c.req.formData()
   const fileValue = form.get('file')
   if (!(fileValue instanceof File)) {
-    return fail(c, HttpStatusCodes.INTERNAL_SERVER_ERROR, 'Please upload file with multipart/form-data')
+    return fail(c, HttpStatusCodes.INTERNAL_SERVER_ERROR, '上传请使用 multipart/form-data')
   }
 
   const dirValue = form.get('dir')

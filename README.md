@@ -49,27 +49,52 @@ pnpm run dev
 
 环境变量由 [`src/env.ts`](src/env.ts) 使用 Zod 在启动时校验，不满足要求会直接退出进程。
 
-| 变量名                  | 必填 | 默认值        | 说明                               |
-| ----------------------- | ---- | ------------- | ---------------------------------- |
-| `NODE_ENV`              | 否   | `development` | 运行环境                           |
-| `PORT`                  | 否   | `3000`        | 服务端口                           |
-| `OSS_ACCESS_KEY_ID`     | 是   | -             | 阿里云 OSS AccessKey ID            |
-| `OSS_ACCESS_KEY_SECRET` | 是   | -             | 阿里云 OSS AccessKey Secret        |
-| `OSS_BUCKET`            | 是   | -             | OSS Bucket 名称                    |
-| `OSS_REGION`            | 是   | -             | OSS Region，例如 `oss-cn-hangzhou` |
-| `OSS_BASE_URL`          | 是   | -             | OSS 对外访问基础地址               |
+| 变量名                          | 必填 | 默认值                               | 说明                               |
+| ------------------------------- | ---- | ------------------------------------ | ---------------------------------- |
+| `NODE_ENV`                      | 否   | `development`                        | 运行环境                           |
+| `PORT`                          | 否   | `3000`                               | 服务端口                           |
+| `OSS_ACCESS_KEY_ID`             | 是   | -                                    | 阿里云 OSS AccessKey ID            |
+| `OSS_ACCESS_KEY_SECRET`         | 是   | -                                    | 阿里云 OSS AccessKey Secret        |
+| `OSS_BUCKET`                    | 是   | -                                    | OSS Bucket 名称                    |
+| `OSS_REGION`                    | 是   | -                                    | OSS Region，例如 `oss-cn-hangzhou` |
+| `OSS_BASE_URL`                  | 是   | -                                    | OSS 对外访问基础地址               |
+| `DB_FILE_URL`                   | 否   | `./src/db/dev.db`                    | SQLite 文件路径                    |
+| `REDIS_SERVER`                  | 否   | `redis://user:123456@localhost:6379` | Redis 连接串                       |
+| `JWT_ADMIN_SECRET`              | 是   | -                                    | 管理端 JWT 密钥                    |
+| `JWT_ADMIN_EXPIRES_IN_SECONDS`  | 否   | `86400`                              | 管理端 JWT 过期秒数（最小 60）     |
+| `JWT_CLIENT_SECRET`             | 是   | -                                    | 客户端 JWT 密钥                    |
+| `JWT_CLIENT_EXPIRES_IN_SECONDS` | 否   | `86400`                              | 客户端 JWT 过期秒数（最小 60）     |
+
+说明：
+
+- “必填”以 [`src/env.ts`](src/env.ts) 的 Zod schema 是否提供默认值为准。
+- 即使有默认值，生产环境也建议显式配置，避免不同环境行为不一致。
 
 示例：
 
 ```env
+# 基本信息
 NODE_ENV=development
 PORT=3000
 
+# OSS 配置
 OSS_ACCESS_KEY_ID=your_key_id
 OSS_ACCESS_KEY_SECRET=your_key_secret
 OSS_BUCKET=your_bucket
 OSS_REGION=oss-cn-hangzhou
 OSS_BASE_URL=https://your-bucket.oss-cn-hangzhou.aliyuncs.com
+
+# 数据库配置
+DB_FILE_URL=./src/db/dev.db
+
+# Redis 配置
+REDIS_SERVER=redis://user:123456@localhost:6379
+
+# JWT 配置
+JWT_ADMIN_SECRET=abcdefghijklmnopqrstuvwxyz
+JWT_ADMIN_EXPIRES_IN_SECONDS=86400
+JWT_CLIENT_SECRET=zyxwvutsrqponmlkjihgfedcba
+JWT_CLIENT_EXPIRES_IN_SECONDS=86400
 ```
 
 ## 3. 常用命令
@@ -245,6 +270,9 @@ cp .env.example .env
 - `NODE_ENV=production`
 - `PORT=<生产端口>`
 - OSS 相关全部变量
+- `DB_FILE_URL`
+- `REDIS_SERVER`
+- JWT 相关全部变量（`JWT_ADMIN_SECRET`、`JWT_CLIENT_SECRET` 等）
 
 ### 8.3 构建
 
