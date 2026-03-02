@@ -6,7 +6,7 @@ import { user } from '@/db/schema.js'
 import env from '@/env.js'
 import * as HttpStatusCodes from '@/lib/http-status-codes.js'
 import { fail, ok } from '@/lib/response.js'
-import { AuthRole, AuthStatus, createJwt, JwtAudience, revokeJwt, verifyJwt } from '@/utils/jwt.js'
+import { AuthStatus, createJwt, JwtAudience, revokeJwt, verifyJwt } from '@/utils/jwt.js'
 import { verifyPassword } from '@/utils/passwordAuth.js'
 
 export const login: AppRouteHandler<LoginRoute> = async (c) => {
