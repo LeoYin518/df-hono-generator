@@ -1,6 +1,5 @@
 import process from 'node:process'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
-import { reset, seed } from 'drizzle-seed'
 import env from '@/env.js'
 import { hashPassword } from '@/utils/passwordAuth.js'
 import { user } from '../schema.js'

@@ -1,6 +1,6 @@
 import type { LoginRoute, LogoutRoute } from './auth.routes.js'
 import type { AppRouteHandler } from '@/lib/types.js'
-import { and, eq, or } from 'drizzle-orm'
+import { eq, or } from 'drizzle-orm'
 import db from '@/db/index.js'
 import { user } from '@/db/schema.js'
 import env from '@/env.js'

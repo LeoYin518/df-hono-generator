@@ -200,6 +200,7 @@ export const AuthRole = {
 // JWT payload
 export const JwtAudience = {
   ADMIN: 'ADMIN',
+  CLIENT: 'CLIENT',
 } as const
 
 // 用户状态
@@ -207,5 +208,5 @@ export const AuthStatus = {
   DISABLED: 0,
   ENABLED: 1,
   LOCKED: 2,
-  DELETED: 3
+  DELETED: 3,
 } as const
