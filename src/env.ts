@@ -16,6 +16,8 @@ const EnvSchema = z.object({
   OSS_BASE_URL: z.string(),
   // DB
   DB_FILE_URL: z.string().default('./src/db/dev.db'),
+  // REDIS
+  REDIS_SERVER: z.string().default('redis://user:123456@localhost:6379'),
 })
 
 export type Env = z.infer<typeof EnvSchema>

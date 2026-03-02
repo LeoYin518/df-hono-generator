@@ -1,5 +1,14 @@
 import { sql } from 'drizzle-orm'
-import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core'
+import { integer, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core'
+
+export const test = sqliteTable('test', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  username: text('username').notNull(),
+  gender: integer('gender').notNull().default(0),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+})
 
 // 用户表
 export const user = sqliteTable('user', {
@@ -42,17 +51,16 @@ export const oauthAccount = sqliteTable('oauth_account', {
   provider: text('provider').notNull(),
   // 第三方平台返回的唯一ID，微信：unionid 或 openid，GitHub：id
   providerUserId: text('provider_user_id').notNull(),
-  nickname: text('nickname'),  // 第三方平台昵称
-  avatar: text('avatar'),      // 第三方头像
+  nickname: text('nickname'), // 第三方平台昵称
+  avatar: text('avatar'), // 第三方头像
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   expiresAt: text('expires_at'),
   createdAt: text('created_at').notNull().default(sql`(current_timestamp)`),
-}, (table) => [
+}, table => [
   // 保证同一个第三方账号在系统里只能绑定一个用户，防止重复绑定和登录混乱
   unique().on(table.provider, table.providerUserId),
-]
-)
+])
 
 // 类别表
 export const category = sqliteTable('category', {

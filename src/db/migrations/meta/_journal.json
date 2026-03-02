@@ -15,6 +15,13 @@
       "when": 1772371481493,
       "tag": "0001_minor_phantom_reporter",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1772420249807,
+      "tag": "0002_same_the_spike",
+      "breakpoints": true
     }
   ]
 }
