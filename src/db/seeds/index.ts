@@ -2,12 +2,28 @@ import process from 'node:process'
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import { reset, seed } from 'drizzle-seed'
 import env from '@/env.js'
-import { test } from '../schema.js'
+import { hashPassword } from '@/utils/passwordAuth.js'
+import { user } from '../schema.js'
 
 async function main() {
   const db = drizzle(env.DB_FILE_URL) // 例如 "./src/db/sqlite.db"
-  await reset(db, { test }) // 每次重置表数据，也就是截断
-  await seed(db, { test }, { count: 50 })
+
+  // 插入一个固定的管理员账号
+  await db.insert(user).values({
+    username: 'admin',
+    password: hashPassword('123'),
+    email: 'admin@qq.com',
+    mobile: '13333333333',
+    nickname: '大飞',
+    avatar: null,
+    gender: 0,
+    birthday: null,
+    region: 'CN',
+    signature: '热爱你的热爱',
+    role: 0,
+    status: 1,
+  })
+
   console.log('✅ 种子执行成功')
 }
 

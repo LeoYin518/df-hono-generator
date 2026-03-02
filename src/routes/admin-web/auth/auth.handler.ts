@@ -6,7 +6,7 @@ import { user } from '@/db/schema.js'
 import env from '@/env.js'
 import * as HttpStatusCodes from '@/lib/http-status-codes.js'
 import { fail, ok } from '@/lib/response.js'
-import { AuthRole, createJwt, JwtAudience, revokeJwt, verifyJwt } from '@/utils/jwt.js'
+import { AuthRole, AuthStatus, createJwt, JwtAudience, revokeJwt, verifyJwt } from '@/utils/jwt.js'
 import { verifyPassword } from '@/utils/passwordAuth.js'
 
 export const login: AppRouteHandler<LoginRoute> = async (c) => {
@@ -15,10 +15,7 @@ export const login: AppRouteHandler<LoginRoute> = async (c) => {
   const rows = await db.select()
     .from(user)
     .where(
-      and(
-        eq(user.status, 1),
-        or(eq(user.email, account), eq(user.mobile, account)),
-      ),
+      or(eq(user.email, account), eq(user.mobile, account)),
     )
   if (rows.length === 0) {
     return fail(c, HttpStatusCodes.NOT_FOUND, '用户不存在')
@@ -27,6 +24,18 @@ export const login: AppRouteHandler<LoginRoute> = async (c) => {
   const found = rows[0]
   if (found.role !== AuthRole.ADMIN) {
     return fail(c, HttpStatusCodes.FORBIDDEN, '登录失败，非管理员账号')
+  }
+
+  if (found.status !== AuthStatus.ENABLED) {
+    if (found.status === AuthStatus.DISABLED) {
+      return fail(c, HttpStatusCodes.FORBIDDEN, '登录失败，用户被禁用')
+    }
+    if (found.status === AuthStatus.LOCKED) {
+      return fail(c, HttpStatusCodes.FORBIDDEN, '登录失败，用户被锁定')
+    }
+    if (found.status === AuthStatus.DELETED) {
+      return fail(c, HttpStatusCodes.FORBIDDEN, '登录失败，用户被删除')
+    }
   }
 
   const passwordValid = verifyPassword(password, found.password!)

@@ -201,3 +201,11 @@ export const AuthRole = {
 export const JwtAudience = {
   ADMIN: 'ADMIN',
 } as const
+
+// 用户状态
+export const AuthStatus = {
+  DISABLED: 0,
+  ENABLED: 1,
+  LOCKED: 2,
+  DELETED: 3
+} as const
