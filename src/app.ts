@@ -1,5 +1,6 @@
 import { configureOpenAPI } from '@/lib/configure-open-api.js'
 import createApp from '@/lib/create-app.js'
+import adminAuth from '@/routes/admin-web/auth/auth.index.js'
 import demo from '@/routes/demo/demo.index.js'
 import alioss from '@/routes/oss/alioss.index.js'
 
@@ -11,6 +12,7 @@ configureOpenAPI(app)
 const routes = [
   { path: '/test', router: demo },
   { path: '/oss', router: alioss },
+  { path: '/admin', router: adminAuth },
 ]
 
 // 注册所有路由
