@@ -1,7 +1,7 @@
 {
   "name": "df-hono-generator",
   "type": "module",
-  "version": "v1.0.0",
+  "version": "v1.0.1",
   "license": "MIT",
   "bin": { "df-hono-generator": "bin/create.cjs" },
   "files": ["bin", "template"],
