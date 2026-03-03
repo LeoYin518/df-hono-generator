@@ -143,9 +143,17 @@ JWT_CLIENT_EXPIRES_IN_SECONDS=86400
 pnpm run dev      # 开发模式（tsx watch）
 pnpm run build    # TypeScript 构建到 dist
 pnpm run start    # 运行构建产物
+pnpm run gen:route <module-path> [mount-path] # 生成 CRUD 路由三件套并自动注册到 app.ts
 pnpm run lint     # 代码检查
 pnpm run lint:fix # 自动修复格式与部分 lint 问题
 pnpm run test     # 运行测试（node:test + tsx）
+```
+
+示例：
+
+```bash
+pnpm run gen:route admin-web/category
+pnpm run gen:route admin-web/category /admin/category
 ```
 
 ## 4. 目录约定
@@ -167,13 +175,13 @@ src/
    *.test.ts                # 集成/接口测试
 ```
 
-新增业务模块时，建议沿用三件套：
+新增业务模块时，建议沿用三件套（也可通过生成命令自动创建）：
 
 - `xxx.routes.ts`
 - `xxx.handler.ts`
 - `xxx.index.ts`
 
-并在 [`src/app.ts`](src/app.ts) 中统一注册：
+并在 [`src/app.ts`](src/app.ts) 中统一注册（`pnpm run gen:route` 会自动补齐）：
 
 ```ts
 app.route('/prefix', xxxRouter)
@@ -355,10 +363,9 @@ pm2 startup
 
 ## 9. 新增模块 Checklist
 
-- 新建 `src/routes/<module>/` 三件套文件
+- 运行 `pnpm run gen:route <module-path> [mount-path]` 生成三件套与自动注册
 - 在 `*.routes.ts` 完成 schema 与响应声明
 - 在 `*.handler.ts` 实现业务逻辑
-- 在 `src/app.ts` 注册路由前缀
 - 为核心接口补充 `test/*.test.ts`
 - 本地通过 `pnpm run lint && pnpm run test`
 
