@@ -1,4 +1,4 @@
-import type { ZodSchema } from './types.ts'
+import type { ZodSchema } from './types.js'
 
 function jsonContent(schema: ZodSchema, description: string) {
   return {

@@ -1,7 +1,11 @@
 import type { AppOpenAPI } from './types.js'
 import { Scalar } from '@scalar/hono-api-reference'
 import env from '@/env.js'
-import packageJSON from '../../package.json' with { type: 'json' }
+import { readFileSync } from 'node:fs'
+
+const packageJSON = JSON.parse(
+  readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
+)
 
 export function configureOpenAPI(app: AppOpenAPI) {
   if (env.NODE_ENV === 'development') {
