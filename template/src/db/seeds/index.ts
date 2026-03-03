@@ -9,7 +9,7 @@ async function main() {
 
   // 插入一个固定的管理员账号
   await db.insert(user).values({
-    username: 'admin',
+    username: 'dafei',
     password: hashPassword('123'),
     email: 'admin@qq.com',
     mobile: '13333333333',
