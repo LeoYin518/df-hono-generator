@@ -63,6 +63,13 @@ catch {
   console.warn('⚠️ 未能自动执行 git init，请手动执行。')
 }
 
+// 4) 修复 npm 发布导致的 .gitignore -> .npmignore 问题
+const npmIgnorePath = path.join(targetDir, '.npmignore')
+const gitIgnorePath = path.join(targetDir, '.gitignore')
+if (fs.existsSync(npmIgnorePath) && !fs.existsSync(gitIgnorePath)) {
+  fs.renameSync(npmIgnorePath, gitIgnorePath)
+}
+
 console.log(`\n✅ 项目已创建: ${targetDir}`)
 console.log('\n下一步:')
 console.log(`  cd ${path.relative(process.cwd(), targetDir) || '.'}`)
