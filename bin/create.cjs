@@ -66,8 +66,41 @@ catch {
 // 4) 修复 npm 发布导致的 .gitignore -> .npmignore 问题
 const npmIgnorePath = path.join(targetDir, '.npmignore')
 const gitIgnorePath = path.join(targetDir, '.gitignore')
+const defaultGitignore = `# dev
+.yarn/
+!.yarn/releases
+.vscode/*
+!.vscode/launch.json
+!.vscode/*.code-snippets
+.idea/workspace.xml
+.idea/usage.statistics.xml
+.idea/shelf
+
+# deps
+node_modules/
+dist/
+
+# env
+.env
+.env.production
+
+# logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# misc
+.DS_Store
+`
 if (fs.existsSync(npmIgnorePath) && !fs.existsSync(gitIgnorePath)) {
   fs.renameSync(npmIgnorePath, gitIgnorePath)
+}
+if (!fs.existsSync(gitIgnorePath)) {
+  fs.writeFileSync(gitIgnorePath, defaultGitignore, 'utf8')
 }
 
 console.log(`\n✅ 项目已创建: ${targetDir}`)
