@@ -1,4 +1,4 @@
-﻿# South Sound Server
+# df-hono-generator
 
 基于 `Hono + TypeScript + Zod OpenAPI` 的后端服务模板。
 
@@ -10,6 +10,20 @@
 - 路由与返回体规范
 - 错误码规范
 - 测试与部署流程
+
+## 目录
+
+- [1. 快速开始](#1-快速开始)
+- [2. 环境变量说明](#2-环境变量说明)
+- [3. 常用命令](#3-常用命令)
+- [4. 目录约定](#4-目录约定)
+- [5. 路由规范](#5-路由规范)
+- [6. 响应与错误码规范](#6-响应与错误码规范)
+- [7. 测试规范](#7-测试规范)
+- [8. 部署步骤（通用）](#8-部署步骤通用)
+- [9. 新增模块 Checklist](#9-新增模块-checklist)
+- [10. 已知注意事项](#10-已知注意事项)
+- [11. License](#11-license)
 
 ## 1. 快速开始
 
@@ -26,8 +40,16 @@ pnpm install
 
 ### 1.3 配置环境变量
 
+macOS / Linux：
+
 ```bash
 cp .env.example .env
+```
+
+Windows PowerShell：
+
+```powershell
+Copy-Item .env.example .env
 ```
 
 按下文「环境变量说明」补齐配置。
@@ -45,6 +67,15 @@ pnpm run dev
 - OpenAPI JSON: `GET /doc`
 - Scalar UI: `GET /scalar`
 
+### 1.6 5 分钟验证
+
+```bash
+pnpm install
+pnpm run dev
+```
+
+访问 `http://localhost:3000/scalar`，能看到接口文档页即表示模板运行正常。
+
 ## 2. 环境变量说明
 
 环境变量由 [`src/env.ts`](src/env.ts) 使用 Zod 在启动时校验，不满足要求会直接退出进程。
@@ -59,7 +90,7 @@ pnpm run dev
 | `OSS_REGION`                    | 是   | -                                    | OSS Region，例如 `oss-cn-hangzhou` |
 | `OSS_BASE_URL`                  | 是   | -                                    | OSS 对外访问基础地址               |
 | `DB_FILE_URL`                   | 否   | `./src/db/dev.db`                    | SQLite 文件路径                    |
-| `REDIS_SERVER`                  | 否   | `redis://user:123456@localhost:6379` | Redis 连接串                       |
+| `REDIS_SERVER`                  | 否   | `redis://default:123456@localhost:6379` | Redis 连接串                       |
 | `JWT_ADMIN_SECRET`              | 是   | -                                    | 管理端 JWT 密钥                    |
 | `JWT_ADMIN_EXPIRES_IN_SECONDS`  | 否   | `86400`                              | 管理端 JWT 过期秒数（最小 60）     |
 | `JWT_CLIENT_SECRET`             | 是   | -                                    | 客户端 JWT 密钥                    |
@@ -88,7 +119,7 @@ OSS_BASE_URL=https://your-bucket.oss-cn-hangzhou.aliyuncs.com
 DB_FILE_URL=./src/db/dev.db
 
 # Redis 配置
-REDIS_SERVER=redis://user:123456@localhost:6379
+REDIS_SERVER=redis://default:123456@localhost:6379
 
 # JWT 配置
 JWT_ADMIN_SECRET=abcdefghijklmnopqrstuvwxyz
@@ -96,6 +127,15 @@ JWT_ADMIN_EXPIRES_IN_SECONDS=86400
 JWT_CLIENT_SECRET=zyxwvutsrqponmlkjihgfedcba
 JWT_CLIENT_EXPIRES_IN_SECONDS=86400
 ```
+
+### 2.1 默认数据库（SQLite）与示例表
+
+- 默认使用 **SQLite** 作为开发环境下的数据库，通过 `DB_FILE_URL` 指向本地 `.db` 文件。
+- 模板仓库中已经内置了一组示例表结构（例如用户、博客等典型业务实体），用于演示常见的 CRUD、分页查询等场景，方便你快速联调与验收接口。
+- 使用本模板时，如果你只想复用脚手架而接入自己现有的业务库，可以：
+  - 直接在现有示例表的基础上增删字段；
+  - 或者删除示例表相关的 schema/迁移/种子数据与路由，仅保留基础应用骨架。
+- `.env.example` 中给出的 `DB_FILE_URL=./src/db/dev.db` 默认指向一份包含示例表结构的 SQLite 文件，开箱即可运行与体验。
 
 ## 3. 常用命令
 
@@ -260,8 +300,17 @@ pnpm install --frozen-lockfile
 
 ### 8.2 配置生产环境变量
 
+macOS / Linux：
+
 ```bash
 cp .env.example .env
+# 编辑 .env，填入生产值
+```
+
+Windows PowerShell：
+
+```powershell
+Copy-Item .env.example .env
 # 编辑 .env，填入生产值
 ```
 
@@ -291,7 +340,7 @@ pnpm run start
 可用 `pm2` 示例：
 
 ```bash
-pm2 start dist/src/index.js --name south-sound-server
+pm2 start dist/index.js --name south-sound-server
 pm2 save
 pm2 startup
 ```
