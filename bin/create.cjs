@@ -2,6 +2,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const process = require('node:process')
+const { execSync } = require('node:child_process')
 
 const [, , rawTarget] = process.argv
 const targetName = rawTarget || 'my-hono-app'
@@ -53,6 +54,14 @@ const targetPkg = JSON.parse(fs.readFileSync(targetPkgPath, 'utf8'))
 targetPkg.name = targetName
 delete targetPkg.bin
 fs.writeFileSync(targetPkgPath, `${JSON.stringify(targetPkg, null, 2)}\n`, 'utf8')
+
+// 3) 初始化 git 仓库
+try {
+  execSync('git init', { cwd: targetDir, stdio: 'ignore' })
+}
+catch {
+  console.warn('⚠️ 未能自动执行 git init，请手动执行。')
+}
 
 console.log(`\n✅ 项目已创建: ${targetDir}`)
 console.log('\n下一步:')

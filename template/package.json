@@ -10,9 +10,10 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "gen:route": "node ./scripts/gen-route.mjs",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "test": "node --import tsx --test test/**/*.test.ts"
+    "lint": "eslint . --ignore-pattern \"**/*.md\"",
+    "lint:fix": "eslint . --fix --ignore-pattern \"**/*.md\"",
+    "test": "node --import tsx --test test/**/*.test.ts",
+    "seed": "tsx src/db/seeds/index.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.9",

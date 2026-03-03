@@ -42,7 +42,7 @@ function parseArgs() {
   }
 
   const moduleName = segments[segments.length - 1]
-  if (!/^[a-z0-9][a-z0-9-_]*$/i.test(moduleName)) {
+  if (!/^[a-z0-9][\w-]*$/i.test(moduleName)) {
     console.error('Error: module name only supports letters, numbers, "-" and "_".')
     process.exit(1)
   }
@@ -240,7 +240,7 @@ function appendRouteItem(appTs, routeLine) {
   if (appTs.includes(routeLine))
     return appTs
 
-  const routesRegex = /const routes = \[(?<content>[\s\S]*?)\n\]/m
+  const routesRegex = /const routes = \[(?<content>[\s\S]*?)\n\]/
   const match = appTs.match(routesRegex)
   if (!match || !match.groups)
     return appTs

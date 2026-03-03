@@ -1,7 +1,7 @@
 import type { AppOpenAPI } from './types.js'
+import { readFileSync } from 'node:fs'
 import { Scalar } from '@scalar/hono-api-reference'
 import env from '@/env.js'
-import { readFileSync } from 'node:fs'
 
 const packageJSON = JSON.parse(
   readFileSync(new URL('../../package.json', import.meta.url), 'utf8'),
