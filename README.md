@@ -11,6 +11,22 @@ npx df-hono-generator my-hono-app
 cd my-hono-app
 ```
 
+按功能裁剪创建（示例）：
+
+```bash
+npx df-hono-generator my-app
+npx df-hono-generator my-app --clean
+npx df-hono-generator my-app --oss --sqlite --redis
+npx df-hono-generator my-app --oss
+npx df-hono-generator my-app --oss --redis
+```
+
+说明：
+
+- 不传功能参数时，默认包含全部功能（`sqlite + oss + redis`）
+- 显式传参数时，默认包含 `sqlite`，再叠加你传入的功能（如 `--oss --redis`）
+- `--clean` 表示空模板，不包含 `sqlite/oss/redis`，且会忽略其它功能参数
+
 ### 2) 安装依赖
 
 ```bash
@@ -33,7 +49,7 @@ Copy-Item .env.example .env
 
 按 `template/README.md` 中的环境变量说明填写 `.env`。
 
-### 4) 初始化数据库
+### 4) 初始化数据库（启用 `--sqlite` 时）
 
 ```bash
 npx drizzle-kit push
@@ -44,6 +60,8 @@ npx drizzle-kit push
 ```bash
 pnpm run seed
 ```
+
+使用 `--clean` 且未显式启用 `--sqlite` 时可跳过第 4、5 步。
 
 ### 6) 启动项目
 
@@ -66,6 +84,11 @@ pnpm run gen:route admin-web/category /admin/category
 - `<module>.routes.ts`（路由与 schema）
 - `<module>.handler.ts`（业务逻辑）
 - `<module>.index.ts`（路由聚合）
+- `schema/<module>.schemas.ts`（模块私有 schema，例如 `crudDataSchema`）
+
+同时复用公共响应 schema：
+
+- `src/utils/response-schema.ts`（`successSchema` / `errorSchema`）
 
 ## 环境要求
 
@@ -79,17 +102,25 @@ pnpm run gen:route admin-web/category /admin/category
 - `@hono/zod-openapi` 自动生成 OpenAPI 文档
 - Scalar API 文档页面（`/scalar`）
 - `dotenv + zod` 环境变量校验
-- SQLite（Drizzle）与 Redis 依赖
+- 可选模块：OSS、SQLite（Drizzle + 登录示例 + seed）、Redis
 - `eslint`、`node:test`、`tsx`
 
 ## 命令行参数
 
 ```bash
-df-hono-generator [project-name]
+df-hono-generator [project-name] [options]
 ```
 
 - 不传 `project-name` 时，默认目录名为 `my-hono-app`
 - 若目标目录已存在且非空，会阻止覆盖并退出
+- 支持功能选项：
+  - `--oss`：包含 OSS 上传模块
+  - `--sqlite`：包含 SQLite + Drizzle + 鉴权示例
+  - `--redis`：包含 Redis 工具模块
+  - `--clean`：空模板（不包含任何可选模块）
+- 不传任何功能选项时，默认包含全部可选模块
+- `docker-compose.yml` 仅在包含 `--redis` 功能时生成
+- 当 `--clean` 与其它功能参数同时出现时，会忽略其它功能参数并给出警告
 
 ## 目录说明（脚手架包本身）
 
@@ -99,4 +130,3 @@ df-hono-generator [project-name]
 ## License
 
 MIT
-

@@ -60,25 +60,10 @@ function buildRoutesTs(moduleName, modulePascalName) {
   return `import { createRoute, z } from '@hono/zod-openapi'
 import * as HttpStatusCodes from '@/lib/http-status-codes.js'
 import jsonContent from '@/lib/json-content.js'
+import { errorSchema, successSchema } from '@/utils/response-schema.js'
+import { crudDataSchema } from './schema/${moduleName}.schemas.js'
 
 const tags = ['${moduleName}']
-
-const crudDataSchema = z.object({
-  id: z.string().or(z.number()),
-}).passthrough()
-
-const successSchema = z.object({
-  success: z.boolean(),
-  code: z.number(),
-  message: z.string(),
-})
-
-const errorSchema = z.object({
-  success: z.boolean(),
-  code: z.string().or(z.number()),
-  message: z.string(),
-  error: z.any().optional(),
-})
 
 export const list = createRoute({
   path: '/',
@@ -92,10 +77,11 @@ export const list = createRoute({
 })
 
 export const detail = createRoute({
-  path: '/:id',
+  path: '/{id}',
   method: 'get',
   tags,
   request: {
+    // request.params 对应 URL 的 path 参数（例如 /:id）
     params: z.object({
       id: z.string(),
     }),
@@ -124,10 +110,11 @@ export const create = createRoute({
 })
 
 export const update = createRoute({
-  path: '/:id',
+  path: '/{id}',
   method: 'put',
   tags,
   request: {
+    // request.params 对应 URL 的 path 参数（例如 /:id）
     params: z.object({
       id: z.string(),
     }),
@@ -143,10 +130,11 @@ export const update = createRoute({
 })
 
 export const remove = createRoute({
-  path: '/:id',
+  path: '/{id}',
   method: 'delete',
   tags,
   request: {
+    // request.params 对应 URL 的 path 参数（例如 /:id）
     params: z.object({
       id: z.string(),
     }),
@@ -164,6 +152,15 @@ export type Detail${modulePascalName}Route = typeof detail
 export type Create${modulePascalName}Route = typeof create
 export type Update${modulePascalName}Route = typeof update
 export type Remove${modulePascalName}Route = typeof remove
+`
+}
+
+function buildModuleSchemaTs() {
+  return `import { z } from '@hono/zod-openapi'
+
+export const crudDataSchema = z.object({
+  id: z.string().or(z.number()),
+}).passthrough()
 `
 }
 
@@ -185,7 +182,8 @@ export const list: AppRouteHandler<List${modulePascalName}Route> = async (c) => 
 
 export const detail: AppRouteHandler<Detail${modulePascalName}Route> = async (c) => {
   // TODO: implement ${moduleName} detail
-  return ok(c, { id: c.req.param('id') })
+  const { id } = c.req.valid('param')
+  return ok(c, { id })
 }
 
 export const create: AppRouteHandler<Create${modulePascalName}Route> = async (c) => {
@@ -196,12 +194,15 @@ export const create: AppRouteHandler<Create${modulePascalName}Route> = async (c)
 
 export const update: AppRouteHandler<Update${modulePascalName}Route> = async (c) => {
   // TODO: implement ${moduleName} update
+  const { id } = c.req.valid('param')
   const payload = await c.req.json()
-  return ok(c, { id: c.req.param('id'), ...payload })
+  return ok(c, { id, ...payload })
 }
 
 export const remove: AppRouteHandler<Remove${modulePascalName}Route> = async (c) => {
   // TODO: implement ${moduleName} remove
+  const { id } = c.req.valid('param')
+  void id
   return ok(c, null)
 }
 `
@@ -240,15 +241,32 @@ function appendRouteItem(appTs, routeLine) {
   if (appTs.includes(routeLine))
     return appTs
 
-  const routesRegex = /const routes = \[(?<content>[\s\S]*?)\n\]/
+  const routesRegex = /const routes\s*=\s*\[(?<content>[\s\S]*?)\]/m
   const match = appTs.match(routesRegex)
-  if (!match || !match.groups)
-    return appTs
+  if (match && match.groups) {
+    const full = match[0]
+    const content = match.groups.content ?? ''
+    const nextContent = content.trim() === ''
+      ? `\n${routeLine}\n`
+      : `${content}\n${routeLine}`
+    const nextFull = `const routes = [${nextContent}]`
+    return appTs.replace(full, nextFull)
+  }
 
-  const full = match[0]
-  const content = match.groups.content
-  const nextContent = `${content}\n${routeLine}`
-  return appTs.replace(full, full.replace(content, nextContent))
+  const fallbackBlock = `const routes = [
+${routeLine}
+]
+
+routes.forEach(({ path, router }) => {
+  app.route(path, router)
+})
+`
+
+  if (appTs.includes('export default app')) {
+    return appTs.replace('export default app', `${fallbackBlock}\nexport default app`)
+  }
+
+  return `${appTs}\n${fallbackBlock}`
 }
 
 function upsertAppRoute(appTsPath, importStatement, routeLine) {
@@ -272,14 +290,17 @@ function main() {
   const modulePascalName = toPascalCase(moduleName)
   const importName = toCamelCase(segments.join('-'))
   const moduleDir = path.resolve(process.cwd(), 'src', 'routes', ...segments)
+  const schemaDir = path.join(moduleDir, 'schema')
 
   fs.mkdirSync(moduleDir, { recursive: true })
+  fs.mkdirSync(schemaDir, { recursive: true })
 
   const routesPath = path.join(moduleDir, `${moduleName}.routes.ts`)
   const handlerPath = path.join(moduleDir, `${moduleName}.handler.ts`)
   const indexPath = path.join(moduleDir, `${moduleName}.index.ts`)
+  const schemaPath = path.join(schemaDir, `${moduleName}.schemas.ts`)
 
-  const files = [routesPath, handlerPath, indexPath]
+  const files = [routesPath, handlerPath, indexPath, schemaPath]
   const existed = files.filter(file => fs.existsSync(file))
   if (existed.length > 0) {
     console.error('Error: target files already exist:')
@@ -290,6 +311,7 @@ function main() {
   fs.writeFileSync(routesPath, buildRoutesTs(moduleName, modulePascalName), 'utf8')
   fs.writeFileSync(handlerPath, buildHandlerTs(moduleName, modulePascalName), 'utf8')
   fs.writeFileSync(indexPath, buildIndexTs(moduleName), 'utf8')
+  fs.writeFileSync(schemaPath, buildModuleSchemaTs(), 'utf8')
 
   const appTsPath = path.resolve(process.cwd(), 'src', 'app.ts')
   const importStatement = `import ${importName} from '@/routes/${segments.join('/')}/${moduleName}.index.js'`

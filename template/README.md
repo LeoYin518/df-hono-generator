@@ -31,7 +31,7 @@ Copy-Item .env.example .env
 
 然后补齐 `.env`（必填项见下文「环境变量说明」）。
 
-### 4) 初始化数据库
+### 4) 初始化数据库（启用 `--sqlite` 时）
 
 ```bash
 npx drizzle-kit push
@@ -48,7 +48,7 @@ npx drizzle-kit push
 pnpm run seed
 ```
 
-默认会写入一个管理员账号（见 `src/db/seeds/index.ts`）。
+默认会写入一个管理员账号（见 `src/db/seeds/index.ts`，仅 `--sqlite` 场景可用）。
 
 ### 6) 启动项目
 
@@ -72,6 +72,21 @@ pnpm run gen:route admin-web/category /admin/category
 - `<module>.routes.ts`：路由与 schema
 - `<module>.handler.ts`：业务逻辑
 - `<module>.index.ts`：路由聚合
+- `schema/<module>.schemas.ts`：模块私有 schema（例如 `crudDataSchema`）
+
+公共响应结构 schema 放在：
+
+- `src/utils/response-schema.ts`：`successSchema`、`errorSchema`
+
+功能开关说明：
+
+- 创建项目时如果不传功能参数，默认启用全部功能（`--sqlite --oss --redis`）。
+- 显式传参数时，默认启用 `--sqlite`，再叠加你传入的功能（如 `--oss --redis`）。
+- `--clean` 表示空模板，不包含 `sqlite/oss/redis`，并忽略其它功能参数。
+- 如果你在创建项目时没有启用 `--sqlite`，则不会包含 `src/db`、`auth` 示例路由和 `seed` 脚本。
+- 如果没有启用 `--oss`，则不会包含 OSS 上传路由。
+- 如果没有启用 `--redis`，则不会包含 Redis 工具模块。
+- `docker-compose.yml` 仅在启用 `--redis` 时保留。
 
 ### 8) 5 分钟自检流程
 
@@ -84,6 +99,7 @@ pnpm run dev
 ```
 
 访问 `http://localhost:3000/scalar`，能打开文档页即表示模板可用。
+若使用 `--clean` 且未启用 `--sqlite`，请跳过 `drizzle-kit push` 与 `pnpm run seed`。
 
 ## 常用命令
 
@@ -99,9 +115,12 @@ pnpm run lint:fix # 自动修复格式与部分 lint 问题
 pnpm run test     # 运行测试（node:test + tsx）
 ```
 
+`pnpm run seed` 与 `npx drizzle-kit push` 仅在启用 `--sqlite` 时可用。
+
 ## 环境变量说明
 
 环境变量由 [`src/env.ts`](src/env.ts) 使用 Zod 在启动时校验，不满足要求会直接退出进程。
+实际需要的变量以你创建项目时启用的功能为准（`--oss` / `--sqlite` / `--redis`）。
 
 | 变量名                          | 必填 | 默认值                                      | 说明                               |
 | ------------------------------- | ---- | ------------------------------------------- | ---------------------------------- |
