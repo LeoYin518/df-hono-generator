@@ -319,6 +319,37 @@ export default app
 `
 }
 
+function buildTypesTs(selectedFeatures) {
+  const variableLines = [
+    '    logger: Logger',
+  ]
+
+  if (selectedFeatures.sqlite) {
+    variableLines.push(
+      '    auth?: {',
+      '      userId: number',
+      '      aud: string',
+      '      role?: string',
+      '    }',
+    )
+  }
+
+  return `import type { OpenAPIHono, RouteConfig, RouteHandler, z } from '@hono/zod-openapi'
+
+import type { Logger } from 'pino'
+
+export interface AppType {
+  Variables: {
+${variableLines.join('\n')}
+  }
+}
+
+export type ZodSchema = z.ZodUnion | z.ZodObject | z.ZodArray<z.ZodObject>
+export type AppOpenAPI = OpenAPIHono<AppType>
+export type AppRouteHandler<R extends RouteConfig> = RouteHandler<R, AppType>
+`
+}
+
 function applyFeatureSelection(targetPath, selectedFeatures) {
   if (!selectedFeatures.oss) {
     removeIfExists(path.join(targetPath, 'src', 'routes', 'oss'))
@@ -343,6 +374,7 @@ function applyFeatureSelection(targetPath, selectedFeatures) {
 
   writeFile(path.join(targetPath, 'src', 'app.ts'), buildAppTs(selectedFeatures))
   writeFile(path.join(targetPath, 'src', 'env.ts'), buildEnvTs(selectedFeatures))
+  writeFile(path.join(targetPath, 'src', 'lib', 'types.ts'), buildTypesTs(selectedFeatures))
   writeFile(path.join(targetPath, '.env.example'), buildEnvExample(selectedFeatures))
 }
 
